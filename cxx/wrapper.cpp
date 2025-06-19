@@ -1,7 +1,6 @@
 #include "Suffix_Array.hpp"
 #include <cstring>
 #include <fstream>
-#include <iostream>
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,6 +47,7 @@ inline void _build_sa(const T_seq_ *text, const T_idx_ len, const bool ext_mem,
       std::streamsize size = bucket.tellg();
       bucket.seekg(0, std::ios::beg);
       bucket.read(reinterpret_cast<char *>(dest), size);
+      dest = &dest[size / sizeof(T_idx_)];
       bucket.close();
     }
     suf_arr.remove_extmem_partitions();
