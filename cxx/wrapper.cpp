@@ -37,19 +37,9 @@ inline void _build_sa(const T_seq_ *text, const T_idx_ len, const bool ext_mem,
                                                 max_context, output_lcp);
   ext_mem ? suf_arr.construct_ext_mem() : suf_arr.construct();
 
-  if (!ext_mem) {
-    std::memcpy(reinterpret_cast<void *>(dest), suf_arr.SA(),
-                len * sizeof(T_idx_));
-  } else {
-    for (T_idx_ p_id = 0; p_id < suf_arr.p(); ++p_id) {
-      std::ifstream bucket(suf_arr.SA_bucket_file_path(p_id));
-      bucket.seekg(0, std::ios::end);
-      std::streamsize size = bucket.tellg();
-      bucket.seekg(0, std::ios::beg);
-      bucket.read(reinterpret_cast<char *>(dest), size);
-      dest = &dest[size / sizeof(T_idx_)];
-      bucket.close();
-    }
+  std::memcpy(reinterpret_cast<void *>(dest), suf_arr.SA(),
+              len * sizeof(T_idx_));
+  if (ext_mem) {
     suf_arr.remove_extmem_partitions();
   }
 }
