@@ -54,6 +54,11 @@ mod tests {
             sa,
             vec![16, 10, 4, 17, 11, 5, 14, 8, 2, 15, 9, 3, 12, 6, 0, 13, 7, 1]
         );
+
+        let text: Vec<_> = (0..10_000).rev().collect();
+        let mut sa = Vec::new();
+        build_sa_u32(&text, &mut sa, false);
+        assert_eq!(sa, text);
     }
 
     #[test]
@@ -65,5 +70,13 @@ mod tests {
             sa,
             vec![16, 10, 4, 17, 11, 5, 14, 8, 2, 15, 9, 3, 12, 6, 0, 13, 7, 1]
         );
+
+        let text: Vec<_> = (0..10_000).rev().collect();
+        let mut sa = Vec::new();
+        build_sa_u32(&text, &mut sa, true);
+        for (i, x) in text.iter().copied().enumerate() {
+            assert_eq!(sa[i], x);
+        }
+        assert_eq!(sa, text);
     }
 }
