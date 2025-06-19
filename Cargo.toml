@@ -1,0 +1,16 @@
+[package]
+name = "caps-sa-rs"
+version = "0.1.0"
+authors = ["Igor Martayan <imartayan@users.noreply.github.com>"]
+description = "Rust bindings for CaPS-SA, a parallel and cache-friendly Suffix Array and LCP array construction algorithm."
+keywords = ["suffix-array", "lcp"]
+repository = "https://github.com/imartayan/caps-sa-rs"
+readme = "README.md"
+license = "MIT"
+edition = "2024"
+
+[build-dependencies]
+cmake = "0.1"
+
+[dependencies]
+paste = "1.0"
