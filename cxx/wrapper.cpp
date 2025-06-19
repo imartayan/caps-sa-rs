@@ -31,9 +31,11 @@ inline void _build_sa(const T_seq_ *text, const T_idx_ len, const bool ext_mem,
   const std::string ext_mem_path = "caps_sa_bucket";
   const T_idx_ subproblem_count = 0;
   const T_idx_ max_context = 0;
+  const bool output_lcp = false;
 
-  CaPS_SA::Suffix_Array<T_seq_, T_idx_> suf_arr(
-      text, len, ext_mem, ext_mem_path, subproblem_count, max_context);
+  CaPS_SA::Suffix_Array<T_seq_, T_idx_> suf_arr(text, len, ext_mem,
+                                                ext_mem_path, subproblem_count,
+                                                max_context, output_lcp);
   ext_mem ? suf_arr.construct_ext_mem() : suf_arr.construct();
 
   if (!ext_mem) {
@@ -48,6 +50,7 @@ inline void _build_sa(const T_seq_ *text, const T_idx_ len, const bool ext_mem,
       bucket.read(reinterpret_cast<char *>(dest), size);
       bucket.close();
     }
+    suf_arr.remove_extmem_partitions();
   }
 }
 
