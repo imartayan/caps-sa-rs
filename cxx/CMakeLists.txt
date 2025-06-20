@@ -6,9 +6,14 @@ project(caps_sa_wrapper
 set(CMAKE_CXX_STANDARD 17)
 set(CAPSSA_QUIET TRUE)
 
-add_subdirectory(CaPS-SA)
+include(FetchContent)
+FetchContent_Declare(
+    caps_sa
+    URL https://github.com/jamshed/CaPS-SA/archive/refs/heads/dev-arm-unification.zip
+)
+FetchContent_MakeAvailable(caps_sa)
 
-get_directory_property(CAPSSA_COMPILE_DEFS DIRECTORY CaPS-SA COMPILE_DEFINITIONS)
+get_directory_property(CAPSSA_COMPILE_DEFS DIRECTORY ${caps_sa_SOURCE_DIR} COMPILE_DEFINITIONS)
 foreach (d ${CAPSSA_COMPILE_DEFS})
   message("CaPS-SA set compile definition: '${d}'")
   add_compile_definitions(${d})
