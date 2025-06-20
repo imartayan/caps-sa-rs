@@ -1,6 +1,9 @@
 #include "Suffix_Array.hpp"
+#include <cstdlib>
 #include <cstring>
+#include <ctime>
 #include <fstream>
+#include <string>
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,7 +45,9 @@ template <typename T_seq_, typename T_idx_>
 inline void _build_sa_lcp(const T_seq_ *text, const T_idx_ len,
                           const bool ext_mem, T_idx_ *sa,
                           T_idx_ *lcp = nullptr) {
-  const std::string ext_mem_path = "caps_sa_bucket";
+  std::srand(std::time(0));
+  const std::string ext_mem_path =
+      "caps_sa_bucket_" + std::to_string(std::rand() % 512) + "_";
   const T_idx_ subproblem_count = 0;
   const T_idx_ max_context = 0;
   const bool output_lcp = lcp != nullptr;
