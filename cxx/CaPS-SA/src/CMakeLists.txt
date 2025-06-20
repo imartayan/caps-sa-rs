@@ -7,15 +7,13 @@ set(PROJECT_SRC
         Genomic_Text.cpp
 )
 
-message(status "current source dir: ${CMAKE_CURRENT_SOURCE_DIR}")
-message(status "source dir: ${CMAKE_SOURCE_DIR}")
 
 # Core library.
 add_library(core STATIC ${PROJECT_SRC})
 
 
 # Include paths for the compiler.
-set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+set(INCLUDE_DIR ${CAPSA_LIB_PROJECT_PATH}/include)
 target_include_directories(core PUBLIC ${INCLUDE_DIR} ${EXT_INCLUDE})
 
 
@@ -24,9 +22,11 @@ add_executable(${PROJECT_NAME} main.cpp)
 add_executable(test test.cpp)
 
 
-# Add dependencies of the core.
-add_dependencies(core prj_parlaylib prj_simde)
-
+# Add dependency of the core to parlaylib.
+add_dependencies(core prj_parlaylib)
+if (NEED_SIMDE)
+  add_dependencies(core prj_simde)
+endif()
 
 # Compiler flags.
 target_compile_options(core PRIVATE ${COMPILE_FLAGS})
@@ -51,4 +51,3 @@ target_link_libraries(test PRIVATE ${LINK_FLAGS})
 install(TARGETS ${PROJECT_NAME}
         DESTINATION bin
 )
-

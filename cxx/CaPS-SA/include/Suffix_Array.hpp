@@ -3,12 +3,16 @@
 #define THEMIS_SUFFIX_ARRAY_HPP
 
 
+#ifdef USE_SIMDE
+    #include "x86/avx2.h"
+#else
+    #include <immintrin.h>
+#endif
 
 #include "Ext_Mem_Bucket.hpp"
 #include "Genomic_Text.hpp"
 #include "Spin_Lock.hpp"
 #include "utility.hpp"
-#include "x86/avx2.h"
 
 #include <cstdint>
 #include <cstddef>
@@ -177,6 +181,9 @@ private:
     // Prints some key statistics of the final partition sizes.
     void print_stats() const;
 
+    const std::string SA_bucket_file_path(const idx_t p_id) const { return ext_mem_path + "SA_" + std::to_string(p_id); }
+    const std::string LCP_bucket_file_path(const idx_t p_id) const { return ext_mem_path + "LCP_" + std::to_string(p_id); }
+
     // Computes in-place prefix-sum in the array `A` for the first `n` elements.
     // `A` must have size at least `n + 1`—one extra entry is required to hold
     // the total sum.
@@ -218,16 +225,6 @@ public:
 
     // Returns the length of the text.
     idx_t n() const { return n_; }
-
-    // Returns the count of subproblems.
-    idx_t p() const { return p_; }
-
-    const std::string SA_bucket_file_path(const idx_t p_id) const {
-      return ext_mem_path + "SA_" + std::to_string(p_id);
-    }
-    const std::string LCP_bucket_file_path(const idx_t p_id) const {
-      return ext_mem_path + "LCP_" + std::to_string(p_id);
-    }
 
     // Returns the SA.
     const idx_t* SA();
@@ -354,6 +351,26 @@ inline T_idx_ Suffix_Array<T_seq_, T_idx_>::LCP(const char* const x, const char*
     }
 }
 
+#ifndef USE_SIMDE
+template <typename T_seq_, typename T_idx_>
+template <std::size_t N>
+inline T_idx_ Suffix_Array<T_seq_, T_idx_>::LCP_unrolled(const char* const x, const char* const y)
+{
+    if constexpr(N == 0)
+        return 0;
+    else
+    {
+        const auto v1 = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(x));
+        const auto v2 = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(y));
+        const auto cmp = _mm256_cmpeq_epi8(v1, v2);
+        const auto mask = static_cast<uint32_t>(_mm256_movemask_epi8(cmp));
+        if(mask != 0xFFFFFFFF)
+            return __builtin_ctz(~mask);
+
+        return 32 + LCP_unrolled<N - 1>(x + 32, y + 32);
+    }
+}
+#else
 
 template <typename T_seq_, typename T_idx_>
 template <std::size_t N>
@@ -374,6 +391,7 @@ inline T_idx_ Suffix_Array<T_seq_, T_idx_>::LCP_unrolled(const char* const x, co
     }
 }
 
+#endif // USE_SIMDE
 
 template <typename T_seq_, typename T_idx_>
 inline T_idx_ Suffix_Array<T_seq_, T_idx_>::LCP(const T_seq_* const x, const T_seq_* const y, const idx_t ctx)
