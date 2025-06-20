@@ -4,7 +4,6 @@ project(caps_sa_wrapper
         LANGUAGES CXX
 )
 set(CMAKE_CXX_STANDARD 17)
-set(CAPSSA_QUIET TRUE)
 
 include(FetchContent)
 FetchContent_Declare(

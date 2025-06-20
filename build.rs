@@ -11,6 +11,9 @@ fn main() {
     if let Ok(cxx_var) = std::env::var("CXX") {
         cfg.define("CMAKE_CXX_COMPILER", cxx_var);
     }
+    if cfg!(feature = "quiet") {
+        cfg.define("CAPSSA_QUIET", "TRUE");
+    }
 
     let dst = cfg.build();
     println!("cargo:rustc-link-search=native={}", dst.display());
