@@ -83,13 +83,11 @@ macro_rules! build_sa_t {
 
             #[doc = "Builds a suffix array and LCP array from `text` encoded as `" $t "`, stores the suffix array in `sa` and the LCP array in `lcp`."]
             #[doc = ""]
-            #[doc = "It uses external memory if `ext_mem` is set to `true`."]
+            #[doc = "LCP array construction in external memory is currently unsupported."]
             #[doc = "For texts larger than `2^32` characters, use [`build_large_sa_lcp_" $t "`] instead."]
             #[inline(always)]
-            pub fn [<build_sa_lcp_$t>](text: &[$t], sa: &mut Vec<u32>, lcp: &mut Vec<u32>, ext_mem: bool) {
-                if ext_mem {
-                    unimplemented!();
-                }
+            pub fn [<build_sa_lcp_$t>](text: &[$t], sa: &mut Vec<u32>, lcp: &mut Vec<u32>) {
+                let ext_mem = false;
                 sa.reserve(text.len());
                 lcp.reserve(text.len());
                 unsafe {
@@ -101,13 +99,11 @@ macro_rules! build_sa_t {
 
             #[doc = "Builds a suffix array and LCP array from large `text` encoded as `" $t "`, stores the suffix array in `sa` and the LCP array in `lcp`."]
             #[doc = ""]
-            #[doc = "It uses external memory if `ext_mem` is set to `true`."]
+            #[doc = "LCP array construction in external memory is currently unsupported."]
             #[doc = "For texts smaller than `2^32` characters, [`build_sa_lcp_" $t "`] is recommended."]
             #[inline(always)]
-            pub fn [<build_large_sa_lcp_$t>](text: &[$t], sa: &mut Vec<u64>, lcp: &mut Vec<u64>, ext_mem: bool) {
-                if ext_mem {
-                    unimplemented!();
-                }
+            pub fn [<build_large_sa_lcp_$t>](text: &[$t], sa: &mut Vec<u64>, lcp: &mut Vec<u64>) {
+                let ext_mem = false;
                 sa.reserve(text.len());
                 lcp.reserve(text.len());
                 unsafe {
@@ -166,7 +162,7 @@ mod tests {
         let text = [6, 7, 4, 5, 2, 3, 6, 7, 4, 5, 2, 3, 6, 7, 4, 5, 2, 3];
         let mut sa = Vec::new();
         let mut lcp: Vec<u32> = Vec::new();
-        build_sa_lcp_u32(&text, &mut sa, &mut lcp, false);
+        build_sa_lcp_u32(&text, &mut sa, &mut lcp);
         assert_eq!(
             sa,
             vec![16, 10, 4, 17, 11, 5, 14, 8, 2, 15, 9, 3, 12, 6, 0, 13, 7, 1]
