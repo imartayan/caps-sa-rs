@@ -55,7 +55,7 @@ unsafe extern "C" {
 macro_rules! build_sa_t {
     ($($t:ty),+) => {$(
         paste::paste! {
-            #[doc = "Builds a suffix array from `text` encoded as `" $t "` and stores it in `sa`."]
+            #[doc = "Builds a suffix array from `text` encoded as `" $t "` and appends it to `sa`."]
             #[doc = ""]
             #[doc = "It uses external memory if `ext_mem` is set to `true`."]
             #[doc = "For texts larger than `2^32` characters, use [`build_large_sa_" $t "`] instead."]
@@ -63,12 +63,12 @@ macro_rules! build_sa_t {
             pub fn [<build_sa_$t>](text: &[$t], sa: &mut Vec<u32>, ext_mem: bool) {
                 sa.reserve(text.len());
                 unsafe {
-                    [<_build_sa_$t>](text.as_ptr(), text.len() as u32, ext_mem, sa.as_mut_ptr());
-                    sa.set_len(text.len());
+                    [<_build_sa_$t>](text.as_ptr(), text.len() as u32, ext_mem, sa.as_mut_ptr().add(sa.len()));
+                    sa.set_len(sa.len() + text.len());
                 }
             }
 
-            #[doc = "Builds a suffix array from large `text` encoded as `" $t "` and stores it in `sa`."]
+            #[doc = "Builds a suffix array from large `text` encoded as `" $t "` and appends it to `sa`."]
             #[doc = ""]
             #[doc = "It uses external memory if `ext_mem` is set to `true`."]
             #[doc = "For texts smaller than `2^32` characters, [`build_sa_" $t "`] is recommended."]
@@ -76,12 +76,12 @@ macro_rules! build_sa_t {
             pub fn [<build_large_sa_$t>](text: &[$t], sa: &mut Vec<u64>, ext_mem: bool) {
                 sa.reserve(text.len());
                 unsafe {
-                    [<_build_large_sa_$t>](text.as_ptr(), text.len() as u64, ext_mem, sa.as_mut_ptr());
-                    sa.set_len(text.len());
+                    [<_build_large_sa_$t>](text.as_ptr(), text.len() as u64, ext_mem, sa.as_mut_ptr().add(sa.len()));
+                    sa.set_len(sa.len() + text.len());
                 }
             }
 
-            #[doc = "Builds a suffix array and LCP array from `text` encoded as `" $t "`, stores the suffix array in `sa` and the LCP array in `lcp`."]
+            #[doc = "Builds a suffix array and LCP array from `text` encoded as `" $t "`, appends the suffix array to `sa` and the LCP array to `lcp`."]
             #[doc = ""]
             #[doc = "LCP array construction in external memory is currently unsupported."]
             #[doc = "For texts larger than `2^32` characters, use [`build_large_sa_lcp_" $t "`] instead."]
@@ -91,13 +91,13 @@ macro_rules! build_sa_t {
                 sa.reserve(text.len());
                 lcp.reserve(text.len());
                 unsafe {
-                    [<_build_sa_lcp_$t>](text.as_ptr(), text.len() as u32, ext_mem, sa.as_mut_ptr(), lcp.as_mut_ptr());
-                    sa.set_len(text.len());
-                    lcp.set_len(text.len());
+                    [<_build_sa_lcp_$t>](text.as_ptr(), text.len() as u32, ext_mem, sa.as_mut_ptr().add(sa.len()), lcp.as_mut_ptr().add(lcp.len()));
+                    sa.set_len(sa.len() + text.len());
+                    lcp.set_len(lcp.len() + text.len());
                 }
             }
 
-            #[doc = "Builds a suffix array and LCP array from large `text` encoded as `" $t "`, stores the suffix array in `sa` and the LCP array in `lcp`."]
+            #[doc = "Builds a suffix array and LCP array from large `text` encoded as `" $t "`, appends the suffix array to `sa` and the LCP array to `lcp`."]
             #[doc = ""]
             #[doc = "LCP array construction in external memory is currently unsupported."]
             #[doc = "For texts smaller than `2^32` characters, [`build_sa_lcp_" $t "`] is recommended."]
@@ -107,9 +107,9 @@ macro_rules! build_sa_t {
                 sa.reserve(text.len());
                 lcp.reserve(text.len());
                 unsafe {
-                    [<_build_large_sa_lcp_$t>](text.as_ptr(), text.len() as u64, ext_mem, sa.as_mut_ptr(), lcp.as_mut_ptr());
-                    sa.set_len(text.len());
-                    lcp.set_len(text.len());
+                    [<_build_large_sa_lcp_$t>](text.as_ptr(), text.len() as u64, ext_mem, sa.as_mut_ptr().add(sa.len()), lcp.as_mut_ptr().add(lcp.len()));
+                    sa.set_len(sa.len() + text.len());
+                    lcp.set_len(lcp.len() + text.len());
                 }
             }
         }
